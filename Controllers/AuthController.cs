@@ -22,6 +22,8 @@ namespace RecipeWebsite.Controllers
             _context = context;
         }
 
+
+        // POST /api/auth/register
         [HttpPost("register")]
         public ActionResult<User> Register(UserDto userDto)
         {
@@ -51,6 +53,7 @@ namespace RecipeWebsite.Controllers
             return Ok(user);
         }
 
+        // POST /api/auth/login
         [HttpPost("login")]
         public ActionResult<User> Login(LoginDto loginDto)
         {
@@ -67,6 +70,8 @@ namespace RecipeWebsite.Controllers
             return Ok(token);
 
         }
+
+      
 
         private string CreateToken(User user)
         {
