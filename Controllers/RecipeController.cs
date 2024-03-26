@@ -35,6 +35,9 @@ namespace RecipeWebsite.Controllers
             var recipe = await _context.Recipes
                                .Include(r => r.RecipeCategories)
                                .Include(r => r.RecipeIngredients)
+                               .Include(r => r.Comments)
+                               .Include(r => r.Ratings)
+                               .Include(r => r.UserFavorites)
                                .Where(r => r.IsActive)
                                .FirstOrDefaultAsync(r => r.IdRecipe == id);
 
@@ -62,6 +65,7 @@ namespace RecipeWebsite.Controllers
                 VideoUrl = recipeDto.VideoUrl,
                 DateAdded = recipeDto.DateAdded,
                 IsActive = true,
+                
 
             };
 
