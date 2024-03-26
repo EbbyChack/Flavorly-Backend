@@ -16,7 +16,7 @@ namespace RecipeWebsite.Controllers
         }
 
         //POST /api/rating
-        //A USER CAN ONLY RATE A RECIPE ONCE!!!!!
+        //A USER CAN ONLY RATE A RECIPE ONCE!!!!!!!!
         [HttpPost]
         public async Task<ActionResult<Rating>> CreateRating(RatingDto ratingDto)
         {
