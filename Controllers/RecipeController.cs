@@ -18,23 +18,23 @@ namespace RecipeWebsite.Controllers
 
         // GET /api/recipe
         [HttpGet]
-        public ActionResult<IEnumerable<Recipe>> GetRecipes()
+        public async Task<ActionResult<IEnumerable<Recipe>>> GetRecipes()
         {
-            var recipes = _context.Recipes
+            var recipes = await _context.Recipes
                                   .Include(r => r.RecipeCategories)
                                   .Include(r => r.RecipeIngredients)
-                                  .ToList();
+                                  .ToListAsync();
             return Ok(recipes);
         }
 
         // GET /api/recipe/5
         [HttpGet("{id}")]
-        public ActionResult<Recipe> GetRecipe(int id)
+        public async Task<ActionResult<Recipe>> GetRecipe(int id)
         {
-            var recipe = _context.Recipes
-                                  .Where(r => r.IdRecipe == id)
-                                  .Include(r => r.RecipeCategories)
-                                  .Include(r => r.RecipeIngredients);
+            var recipe = await _context.Recipes
+                               .Include(r => r.RecipeCategories)
+                               .Include(r => r.RecipeIngredients)
+                               .FirstOrDefaultAsync(r => r.IdRecipe == id);
 
             if (recipe == null)
                 return NotFound();
@@ -65,14 +65,12 @@ namespace RecipeWebsite.Controllers
 
             recipe.RecipeCategories = recipeDto.RecipeCategoriesIds.Select(id => new RecipeCategory
             {
-                IdCategoryFk = id,
-                IdRecipeFkNavigation = recipe  // Set the navigation property
+                IdCategoryFk = id,    
             }).ToList();
 
             recipe.RecipeIngredients = recipeDto.RecipeIngredientsIds.Select(id => new RecipeIngredient
             {
-                IdIngredientFk = id,
-                IdRecipeFkNavigation = recipe  // Set the navigation property
+                IdIngredientFk = id,              
             }).ToList();
 
             _context.Recipes.Add(recipe);
@@ -85,7 +83,7 @@ namespace RecipeWebsite.Controllers
 
         // PUT /api/recipe/5
         [HttpPut("edit/{id}")]
-        public async Task<ActionResult<Recipe>> UpdateRecipe(int id, Recipe r)
+        public async Task<ActionResult<Recipe>> UpdateRecipe(int id, RecipeEditDto r)
         {
             var recipe = await _context.Recipes
                                       .Include(rc => rc.RecipeCategories)
@@ -95,6 +93,7 @@ namespace RecipeWebsite.Controllers
             if (recipe == null)
                 return NotFound();
 
+            // Update the scalar properties
             recipe.NameRecipe = r.NameRecipe;
             recipe.Description = r.Description;
             recipe.CookingTime = r.CookingTime;
@@ -108,23 +107,58 @@ namespace RecipeWebsite.Controllers
             recipe.DateAdded = r.DateAdded;
             recipe.IsActive = r.IsActive;
 
-            // Add new RecipeCategories
-            var recipeCategoriesToAdd = r.RecipeCategories.Where(rc => !recipe.RecipeCategories.Select(rc => rc.IdCategoryFk).Contains(rc.IdCategoryFk)).ToList();
-            foreach (var rc in recipeCategoriesToAdd)
+            // Update the RecipeCategories
+            _context.RecipeCategories.RemoveRange(recipe.RecipeCategories);
+            recipe.RecipeCategories = r.RecipeCategoriesIds.Select(id => new RecipeCategory
             {
-                recipe.RecipeCategories.Add(rc);
-            }
+                IdCategoryFk = id,
+                IdRecipeFkNavigation = recipe
+            }).ToList();
 
-            // Add new RecipeIngredients
-            var recipeIngredientsToAdd = r.RecipeIngredients.Where(ri => !recipe.RecipeIngredients.Select(ri => ri.IdIngredientFk).Contains(ri.IdIngredientFk)).ToList();
-            foreach (var ri in recipeIngredientsToAdd)
+            // Update the RecipeIngredients
+            _context.RecipeIngredients.RemoveRange(recipe.RecipeIngredients);
+            recipe.RecipeIngredients = r.RecipeIngredientsIds.Select(id => new RecipeIngredient
             {
-                recipe.RecipeIngredients.Add(ri);
-            }
+                IdIngredientFk = id,
+                IdRecipeFkNavigation = recipe
+            }).ToList();
 
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+
+        //soft delete
+        [HttpPost("delete/{id}")]
+        public async Task<ActionResult<Recipe>> DeleteRecipe(int id)
+        {
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.IdRecipe == id);
+
+            if (recipe == null)
+                return NotFound();
+
+            recipe.IsActive = false;
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        // GET /api/recipe/dropdowns
+        [HttpGet("dropdowns")]
+        public async Task<ActionResult<DropdownsDto>> GetDropdowns()
+        {
+            var categories = await _context.Categories.ToListAsync();
+            var ingredients = await _context.Ingredients.ToListAsync();
+
+            var dropdowns = new DropdownsDto
+            {
+                Categories = categories,
+                Ingredients = ingredients
+            };
+
+            return Ok(dropdowns);
         }
 
     }
