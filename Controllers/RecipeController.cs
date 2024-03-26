@@ -23,6 +23,7 @@ namespace RecipeWebsite.Controllers
             var recipes = await _context.Recipes
                                   .Include(r => r.RecipeCategories)
                                   .Include(r => r.RecipeIngredients)
+                                  .Where(r => r.IsActive)
                                   .ToListAsync();
             return Ok(recipes);
         }
@@ -34,6 +35,7 @@ namespace RecipeWebsite.Controllers
             var recipe = await _context.Recipes
                                .Include(r => r.RecipeCategories)
                                .Include(r => r.RecipeIngredients)
+                               .Where(r => r.IsActive)
                                .FirstOrDefaultAsync(r => r.IdRecipe == id);
 
             if (recipe == null)
@@ -59,7 +61,7 @@ namespace RecipeWebsite.Controllers
                 Img3 = recipeDto.Img3,
                 VideoUrl = recipeDto.VideoUrl,
                 DateAdded = recipeDto.DateAdded,
-                IsActive = recipeDto.IsActive,
+                IsActive = true,
 
             };
 
