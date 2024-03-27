@@ -41,8 +41,8 @@ namespace RecipeWebsite.Controllers
                 Name = userDto.Name,
                 Surname = userDto.Surname,
                 DateOfBirth = userDto.DateOfBirth,
-                UserType = userDto.UserType,
-                IsActive = userDto.IsActive
+                UserType = "User",
+                IsActive = true
 
             };
 

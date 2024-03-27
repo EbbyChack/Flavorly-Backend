@@ -36,11 +36,34 @@ namespace RecipeWebsite.Controllers
         {
             var recipe = await _context.Recipes
                                .Include(r => r.RecipeCategories)
-                               .Include(r => r.RecipeIngredients)
-                               .Include(r => r.Comments)
+                               .Include(r => r.RecipeIngredients)                        
                                .Include(r => r.Ratings)
                                .Include(r => r.UserFavorites)
                                .Where(r => r.IsActive)
+                               .Select(r => new Recipe
+                               {
+                                   IdRecipe = r.IdRecipe,
+                                   NameRecipe = r.NameRecipe,
+                                   Description = r.Description,
+                                   CookingTime = r.CookingTime,
+                                   Servings = r.Servings,
+                                   Difficulty = r.Difficulty,
+                                   Instructions = r.Instructions,
+                                   MainImg = r.MainImg,
+                                   Img2 = r.Img2,
+                                   Img3 = r.Img3,
+                                   VideoUrl = r.VideoUrl,
+                                   DateAdded = r.DateAdded,
+                                   IsActive = r.IsActive,
+                                   RecipeCategories = r.RecipeCategories,
+                                   RecipeIngredients = r.RecipeIngredients,
+
+                                   //include only the active comments
+                                   Comments = r.Comments.Where(c => c.IsActive).ToList(),
+                                   Ratings = r.Ratings,
+                                   UserFavorites = r.UserFavorites,
+ 
+                               })
                                .FirstOrDefaultAsync(r => r.IdRecipe == id);
 
             if (recipe == null)
@@ -171,6 +194,20 @@ namespace RecipeWebsite.Controllers
             };
 
             return Ok(dropdowns);
+        }
+
+        // GET THE RECIPES WITH THE HIGHEST RATING
+        [HttpGet("top")]
+        public async Task<ActionResult<IEnumerable<Recipe>>> GetTopRecipes()
+        {
+            var recipes = await _context.Recipes
+                                  .Include(r => r.Ratings)
+                                  .Where(r => r.IsActive)
+                                  .OrderByDescending(r => r.Ratings.Average(r => r.RatingValue))      
+                                  .Take(10)
+                                  .ToListAsync();
+
+            return Ok(recipes);
         }
 
     }
