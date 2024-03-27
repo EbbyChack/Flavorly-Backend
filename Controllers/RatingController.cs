@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace RecipeWebsite.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RatingController : ControllerBase
@@ -16,10 +18,19 @@ namespace RecipeWebsite.Controllers
         }
 
         //POST /api/rating
-        //A USER CAN ONLY RATE A RECIPE ONCE!!!!!!!!
+        
         [HttpPost]
         public async Task<ActionResult<Rating>> CreateRating(RatingDto ratingDto)
         {
+            // Check if the user has already rated this recipe
+            var existingRating = await _context.Ratings
+                .FirstOrDefaultAsync(r => r.IdUserFk == ratingDto.IdUserFk && r.IdRecipeFk == ratingDto.IdRecipeFk);
+
+            if (existingRating != null)
+            {
+                return BadRequest("You have already rated this recipe.");
+            }
+
             //dont forget to multiply the rating value by 2 in the front end
             if (ratingDto.RatingValue < 1 || ratingDto.RatingValue > 10)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeWebsite.Models;
@@ -29,6 +30,7 @@ namespace RecipeWebsite.Controllers
         }
 
         // GET /api/recipe/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Recipe>> GetRecipe(int id)
         {
@@ -48,6 +50,7 @@ namespace RecipeWebsite.Controllers
         }
 
         // POST /api/recipe
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Recipe>> CreateRecipe(RecipeDto recipeDto)
         {
@@ -88,6 +91,7 @@ namespace RecipeWebsite.Controllers
         }
 
         // PUT /api/recipe/5
+        [Authorize(Roles = "Admin")]
         [HttpPut("edit/{id}")]
         public async Task<ActionResult<Recipe>> UpdateRecipe(int id, RecipeEditDto r)
         {
@@ -136,7 +140,8 @@ namespace RecipeWebsite.Controllers
 
 
         //soft delete
-        [HttpPost("delete/{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpPut("delete/{id}")]
         public async Task<ActionResult<Recipe>> DeleteRecipe(int id)
         {
             var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.IdRecipe == id);
@@ -152,6 +157,7 @@ namespace RecipeWebsite.Controllers
         }
 
         // GET /api/recipe/dropdowns
+        [Authorize(Roles = "Admin")]
         [HttpGet("dropdowns")]
         public async Task<ActionResult<DropdownsDto>> GetDropdowns()
         {
