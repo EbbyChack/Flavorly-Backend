@@ -99,7 +99,7 @@ namespace RecipeWebsite.Controllers
                 Img2 = recipeDto.Img2,
                 Img3 = recipeDto.Img3,
                 VideoUrl = recipeDto.VideoUrl,
-                DateAdded = recipeDto.DateAdded,
+                DateAdded = DateOnly.FromDateTime(DateTime.Now),
                 IsActive = true,
                 
 
