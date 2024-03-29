@@ -40,7 +40,7 @@ namespace RecipeWebsite.Controllers
                                .Include(r => r.Ratings)
                                .Include(r => r.UserFavorites)
                                .Where(r => r.IsActive)
-                               .Select(r => new Recipe
+                               .Select(r => new RecipeDto2
                                {
                                    IdRecipe = r.IdRecipe,
                                    NameRecipe = r.NameRecipe,
@@ -59,7 +59,17 @@ namespace RecipeWebsite.Controllers
                                    RecipeIngredients = r.RecipeIngredients,
 
                                    //include only the active comments
-                                   Comments = r.Comments.Where(c => c.IsActive).ToList(),
+                                   Comments = r.Comments
+                                        .Where(c => c.IsActive)
+                                        .Select(c => new CommentDto
+                                        {
+                                            IdComment = c.IdComment,
+                                            CommentText = c.CommentText,
+                                            DatePosted = c.DatePosted,
+                                            UserIdFk = c.UserIdFk,
+                                            Username = _context.Users.Any(u => u.UserId == c.UserIdFk) ? _context.Users.First(u => u.UserId == c.UserIdFk).Username : "Unknown"
+                                        })
+                                        .ToList(),
                                    Ratings = r.Ratings,
                                    UserFavorites = r.UserFavorites,
  
