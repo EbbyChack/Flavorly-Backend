@@ -34,7 +34,7 @@ namespace RecipeWebsite.Controllers
 
         // POST /api/comment
         [HttpPost]
-        public async Task<ActionResult<Comment>> CreateComment(CommentDto commentDto)
+        public async Task<ActionResult<Comment>> CreateComment(CommentDto2 commentDto)
         {
             Comment comment = new Comment
             {

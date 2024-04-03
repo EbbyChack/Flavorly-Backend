@@ -20,7 +20,7 @@ namespace RecipeWebsite.Controllers
        
         // Get all user favorites, searches by user id
         // GET /api/userfavs/5
-        [HttpGet]
+        [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<UserFavorite>>> GetFavsOfUser(int id)
         {
             var favs = await _context.UserFavorites

@@ -1,14 +1,11 @@
 ﻿namespace RecipeWebsite.Models
 {
-    public partial class CommentDto
+    public partial class CommentDto2
     {
-        public int IdComment { get; set; }
+       
         public int UserIdFk { get; set; }
 
-        public string Username { get; set; }
-
-       
-
+  
         public int RecipeIdFk { get; set; }
 
         public string CommentText { get; set; } = null!;
