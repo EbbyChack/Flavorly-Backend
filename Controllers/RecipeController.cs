@@ -148,7 +148,7 @@ namespace RecipeWebsite.Controllers
             recipe.Img3 = r.Img3;
             recipe.VideoUrl = r.VideoUrl;
             recipe.DateAdded = r.DateAdded;
-            recipe.IsActive = r.IsActive;
+            recipe.IsActive = true;
 
             // Update the RecipeCategories
             _context.RecipeCategories.RemoveRange(recipe.RecipeCategories);
