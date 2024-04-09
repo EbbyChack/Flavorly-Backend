@@ -190,7 +190,7 @@ namespace RecipeWebsite.Controllers
         }
 
         // GET /api/recipe/dropdowns
-        [Authorize(Roles = "Admin")]
+        
         [HttpGet("dropdowns")]
         public async Task<ActionResult<DropdownsDto>> GetDropdowns()
         {
